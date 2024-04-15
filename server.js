@@ -46,6 +46,6 @@ mqttClient.on("connect", () => {
 
 mqttClient.on("message", (topic, message) => {
   // message is Buffer
-  //console.log(message.toString());
+  console.log(message.toString());
   run(message.toString()).catch(console.dir);
 });
