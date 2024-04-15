@@ -1,5 +1,8 @@
 // import { MongoClient } from "mongodb";
 const { MongoClient } = require('mongodb')
+
+const mqtt = require("mqtt");
+
 // Replace the uri string with your MongoDB deployment's connection string.
 var config   = require('./config');
 var mongoUri = 'mongodb://' + config.mongodb.hostname + ':' + config.mongodb.port + '/' + config.mongodb.database;
@@ -7,7 +10,6 @@ var date_time = new Date();
 // Create a new client and connect to MongoDB
 const mongoClient = new MongoClient(mongoUri);
 
-const mqtt = require("mqtt");
 var mqttUri  = 'mqtt://' + config.mqtt.hostname + ':' + config.mqtt.port;
 const mqttClient = mqtt.connect(mqttUri);
 
