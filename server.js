@@ -44,7 +44,7 @@ async function run() {
   }
 }
 // Run the function and handle any errors
-//run().catch(console.dir);
+run().catch(console.dir);
 
 mqttClient.on("connect", () => {
   mqttClient.subscribe("+", (err) => {
@@ -57,7 +57,7 @@ mqttClient.on("connect", () => {
 mqttClient.on("activate", (topic, message) => {
   // message is Buffer
   console.log(message.toString());
-  run(message.toString()).catch(console.dir);
+  activate(message).catch(console.dir);
 });
 
 async function activate(name) {
