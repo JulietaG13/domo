@@ -57,7 +57,7 @@ mqttClient.on("connect", () => {
 mqttClient.on("activate", (topic, message) => {
   // message is Buffer
   console.log(message.toString());
-  activate(message).catch(console.dir);
+  activate(message.toString()).catch(console.dir);
 });
 
 async function activate(name) {
