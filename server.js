@@ -1,7 +1,7 @@
 // import { MongoClient } from "mongodb";
 const { MongoClient } = require('mongodb')
 
-const mqtt = require("mqtt");
+const mqtt = require('mqtt');
 
 // Replace the uri string with your MongoDB deployment's connection string.
 var config   = require('./config');
@@ -13,25 +13,33 @@ const mongoClient = new MongoClient(mongoUri);
 var mqttUri  = 'mqtt://' + config.mqtt.hostname + ':' + config.mqtt.port;
 const mqttClient = mqtt.connect(mqttUri);
 
-async function run(msg) {
+async function run() {
   try {
-    // Connect to the "insertDB" database and access its "haiku" collection
     const database = mongoClient.db(config.mongodb.database);
-    const haiku = database.collection("message");
-    
-    // Create a document to insert
-    const doc = {
-//      title: "Record of a Shriveled Datum",
-      fecha: date_time,
-      content: msg,
-    }
-    // Insert the defined document into the "haiku" collection
-    const result = await haiku.insertOne(doc);
+    const user = database.collection("user");
 
-    // Print the ID of the inserted document
-    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+    const user1 = {
+      name: "yo",
+      led1: "ON",
+      led2: "OFF",
+      led3: "ON",
+      led4: "ON",
+    }
+    const user2 = {
+      name: "yo no",
+      led1: "OFF",
+      led2: "OFF",
+      led3: "ON",
+      led4: "ON",
+    }
+
+    const result1 = await user.insertOne(user1);
+    console.log(`A document was inserted with the _id: ${result1.insertedId}`);
+
+    const result2 = await user.insertOne(user2);
+    console.log(`A document was inserted with the _id: ${result2.insertedId}`);
+
   } finally {
-     // Close the MongoDB client connection
     await mongoClient.close();
   }
 }
@@ -46,8 +54,34 @@ mqttClient.on("connect", () => {
   });
 });
 
-mqttClient.on("message", (topic, message) => {
+mqttClient.on("activate", (topic, message) => {
   // message is Buffer
   console.log(message.toString());
   run(message.toString()).catch(console.dir);
 });
+
+async function activate(name) {
+  try {
+    // Find the user document by name
+    const userObj = await userCollection.findOne({ name: name });
+
+    if (!userObj) {
+      console.error(`User "${name}" not found`);
+      return;
+    }
+
+    // Fetch the LED state from the user object
+    const ledState = userObj.led1;
+
+    // Publish the LED state to the LED topic
+    mqttClient.publish("LED", ledState, (err) => {
+      if (err) {
+        console.error("Error publishing message:", err);
+      } else {
+        console.log(`Message "${ledState}" sent to topic "LED" for user ${name}`);
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+  }
+}
