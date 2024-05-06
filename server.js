@@ -18,6 +18,13 @@ async function run() {
     const database = mongoClient.db(config.mongodb.database);
     const user = database.collection("user");
 
+    try {
+      const deleteResult = await user.deleteMany({});
+      console.log(`${deleteResult.deletedCount} documents deleted from the "user" collection`);
+    } catch (error) {
+      console.error("Error clearing user collection:", error);
+    }
+
     const user1 = {
       name: "yo",
       led1: "ON",
