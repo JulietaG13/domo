@@ -13,10 +13,11 @@ const mongoClient = new MongoClient(mongoUri);
 var mqttUri  = 'mqtt://' + config.mqtt.hostname + ':' + config.mqtt.port;
 const mqttClient = mqtt.connect(mqttUri);
 
+const database = mongoClient.db(config.mongodb.database);
+const user = database.collection("user");
+
 async function run() {
   try {
-    const database = mongoClient.db(config.mongodb.database);
-    const user = database.collection("user");
 
     try {
       const deleteResult = await user.deleteMany({});
@@ -75,7 +76,7 @@ mqttClient.on("message", (topic, message) => {
 async function activate(name) {
   try {
     // Find the user document by name
-    const userObj = await userCollection.findOne({ name: name });
+    const userObj = await user.findOne({ name: name });
 
     if (!userObj) {
       console.error(`User "${name}" not found`);
