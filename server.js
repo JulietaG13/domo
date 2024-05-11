@@ -13,10 +13,12 @@ const mongoClient = new MongoClient(mongoUri);
 var mqttUri  = 'mqtt://' + config.mqtt.hostname + ':' + config.mqtt.port;
 const mqttClient = mqtt.connect(mqttUri);
 
+const collectionName = "user";
+
 async function run() {
   try {
     const database = mongoClient.db(config.mongodb.database);
-    const user = database.collection("user");
+    const user = database.collection(collectionName);
 
     try {
       const deleteResult = await user.deleteMany({});
@@ -46,8 +48,8 @@ async function run() {
     const result2 = await user.insertOne(user2);
     console.log(`A document was inserted with the _id: ${result2.insertedId}`);
 
-  } finally {
-    await mongoClient.close();
+  } catch (error) {
+    console.dir(error);
   }
 }
 // Run the function and handle any errors
@@ -75,7 +77,7 @@ mqttClient.on("message", (topic, message) => {
 async function activate(name) {
   try {
     const database = mongoClient.db(config.mongodb.database);
-    const user = database.collection("user");
+    const user = database.collection(collectionName);
     // Find the user document by name
     const userObj = await user.findOne({ name: name });
 
