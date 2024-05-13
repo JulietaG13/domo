@@ -70,18 +70,11 @@ mqttClient.subscribe("activate/#", (err, granted) => {
     console.error("Subscription error:", err);
     return;
   }
-
-  granted.forEach(({ topic, qos }) => {
-    const parts = topic.split("/");
-    activate(parts[0], parts[1]).catch(console.error);
-  });
 })
 
-/*
 mqttClient.on("message", (topic, message) => {
   // message is Buffer
-  console.log("topic: " + topic.toString());
-  console.log("message: " + message.toString());
+  console.log("topic: " + topic.toString() + ".-." + "message: " + message.toString());
 
   const parts = topic.split("/");
   switch (parts[0]) {
@@ -92,7 +85,6 @@ mqttClient.on("message", (topic, message) => {
       break;
   }
 });
-*/
 
 async function activate(name, conf) {
   try {
