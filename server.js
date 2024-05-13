@@ -29,6 +29,7 @@ async function run() {
 
     const user1 = {
       name: "yo",
+      conf: "1",
       led1: "ON",
       led2: "OFF",
       led3: "ON",
@@ -36,6 +37,7 @@ async function run() {
     }
     const user2 = {
       name: "yo no",
+      conf: "1",
       led1: "OFF",
       led2: "OFF",
       led3: "ON",
@@ -67,34 +69,40 @@ mqttClient.on("message", (topic, message) => {
   // message is Buffer
   console.log("topic: " + topic.toString());
   console.log("message: " + message.toString());
-  if (topic === "activate") {
-    activate(message.toString()).catch(console.dir);
+
+  const parts = topic.split("/");
+  switch (parts[0]) {
+    case "activate":
+      break;
+    default:
+      break;
   }
 });
 
-async function activate(name) {
+async function activate(name, conf) {
   try {
     const database = mongoClient.db(config.mongodb.database);
     const user = database.collection(collectionName);
     // Find the user document by name
-    const userObj = await user.findOne({ name: name });
+    const userObj = await user.findOne({ name: name, conf: conf });
 
     if (!userObj) {
-      console.error(`User "${name}" not found`);
+      console.error(`User "${name}" or config "${conf}" not found`);
       return;
     }
 
     // Fetch the LED state from the user object
-    const ledState = userObj.led1;
+    const ledStates = [userObj.led1, userObj.led2, userObj.led3, userObj.led4];
 
-    // Publish the LED state to the LED topic
-    mqttClient.publish("LED", ledState, (err) => {
-      if (err) {
-        console.error("Error publishing message:", err);
-      } else {
-        console.log(`Message "${ledState}" sent to topic "LED" for user ${name}`);
-      }
-    });
+    for (let i = 0; i < ledStates.length; i++) {
+      mqttClient.publish("LED" + i.toString(), ledStates[i], (err) => {
+        if (err) {
+          console.error("Error publishing message:", err);
+        } else {
+          console.log(`Message "${ledStates[i]}" sent to topic "LED${i}" for user ${name}`);
+        }
+      });
+    }
   } catch (error) {
     console.error("Error fetching user:", error);
   }
