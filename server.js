@@ -65,9 +65,13 @@ mqttClient.on("connect", () => {
   });
 });
 
-mqttClient.on("message", (topic, message) => {
-  console.log("MESSAGEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+mqttClient.subscribe("activate/#", (err, granted) => {
+  const parts = granted[0].split("/");
+  activate(parts[0], parts[1]).catch(console.dir);
+})
 
+/*
+mqttClient.on("message", (topic, message) => {
   // message is Buffer
   console.log("topic: " + topic.toString());
   console.log("message: " + message.toString());
@@ -81,6 +85,7 @@ mqttClient.on("message", (topic, message) => {
       break;
   }
 });
+*/
 
 async function activate(name, conf) {
   try {
