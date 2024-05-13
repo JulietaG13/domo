@@ -66,8 +66,15 @@ mqttClient.on("connect", () => {
 });
 
 mqttClient.subscribe("activate/#", (err, granted) => {
-  const parts = granted[0].split("/");
-  activate(parts[0], parts[1]).catch(console.dir);
+  if (err) {
+    console.error("Subscription error:", err);
+    return;
+  }
+
+  granted.forEach(({ topic, qos }) => {
+    const parts = topic.split("/");
+    activate(parts[0], parts[1]).catch(console.error);
+  });
 })
 
 /*
