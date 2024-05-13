@@ -73,6 +73,7 @@ mqttClient.on("message", (topic, message) => {
   const parts = topic.split("/");
   switch (parts[0]) {
     case "activate":
+      activate(parts[1], parts[2]);
       break;
     default:
       break;
