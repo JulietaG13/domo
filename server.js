@@ -65,6 +65,12 @@ mqttClient.on("connect", () => {
       console.error("Subscription error:", err);
     }
   })
+
+  mqttClient.subscribe("create/#", (err, granted) => {
+    if (err) {
+      console.error("Subscription error:", err);
+    }
+  })
 });
 
 mqttClient.on("message", (topic, message) => {
