@@ -93,7 +93,7 @@ mqttClient.on("message", (topic, message) => {
   const parts = topic.split("/");
   switch (parts[0]) {
     case "activate":
-      activate(parts[1], parts[2]).catch(console.dir);
+      activate(parts[1], message.toString()).catch(console.dir);
       break;
     case "create":
       create(parts[1], parts[2], message.toString()).catch(console.dir);
