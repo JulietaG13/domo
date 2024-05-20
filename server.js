@@ -20,6 +20,7 @@ async function run() {
     const database = mongoClient.db(config.mongodb.database);
     const user = database.collection(collectionName);
 
+    /*
     try {
       const deleteResult = await user.deleteMany({});
       console.log(`${deleteResult.deletedCount} documents deleted from the "user" collection`);
@@ -49,7 +50,7 @@ async function run() {
 
     const result2 = await user.insertOne(user2);
     console.log(`A document was inserted with the _id: ${result2.insertedId}`);
-
+    */
   } catch (error) {
     console.dir(error);
   }
