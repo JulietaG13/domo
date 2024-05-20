@@ -154,7 +154,13 @@ async function getConfigs(name) {
     const data = docs.map(doc => doc.config);
 
     if (data.length === 0) {
-
+      mqttClient.publish("send/" + name.toString(), "", (err) => {
+        if (err) {
+          console.error("Error publishing empty message:", err);
+        } else {
+          console.log(`Empty message sent to topic "send/${name}"`);
+        }
+      });
     }
 
     let strConfig = "";
