@@ -72,6 +72,12 @@ mqttClient.on("connect", () => {
       console.error("Subscription error:", err);
     }
   })
+
+  mqttClient.subscribe("get", (err, granted) => {
+    if (err) {
+      console.error("Subscription error:", err);
+    }
+  })
 });
 
 mqttClient.on("message", (topic, message) => {
@@ -87,8 +93,7 @@ mqttClient.on("message", (topic, message) => {
       create(parts[1], parts[2], message.toString()).catch(console.dir);
       break;
     case "get":
-      getConfigs(parts[1]);
-    default:
+      getConfigs(message.toString()).catch(console.dir);
       break;
   }
 });
