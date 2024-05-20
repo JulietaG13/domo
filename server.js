@@ -104,12 +104,12 @@ async function activate(name, conf) {
     // Fetch the LED state from the user object
     const ledStates = [userObj.led1, userObj.led2, userObj.led3, userObj.led4];
 
-    for (let i = 1; i < ledStates.length; i++) {
-      mqttClient.publish("LED" + i.toString(), ledStates[i], (err) => {
+    for (let i = 0; i < ledStates.length; i++) {
+      mqttClient.publish("LED" + (i+1).toString(), ledStates[i], (err) => {
         if (err) {
           console.error("Error publishing message:", err);
         } else {
-          console.log(`Message "${ledStates[i]}" sent to topic "LED${i}" for user ${name}`);
+          console.log(`Message "${ledStates[i]}" sent to topic "LED${i+1}" for user ${name}`);
         }
       });
     }
