@@ -168,9 +168,7 @@ async function getConfigs(name) {
       });
     }
 
-    let strConfig = "";
-    data.forEach((c) => {strConfig = strConfig + c.toString() + ",";});
-    strConfig = strConfig.slice(0, -1);
+    const strConfig = data.map(c => c.toString()).join(",");
 
     mqttClient.publish("send/" + name.toString(), strConfig, (err) => {
       if (err) {
