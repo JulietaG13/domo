@@ -176,7 +176,7 @@ async function getConfigs(name) {
 
     const strConfig = data.map(c => c.toString()).join(",");
 
-    mqttClient.publish("send/" + name.toString(), strConfig, (err) => {
+    mqttClient.publish("send"/* + name.toString()*/, strConfig, (err) => {
       if (err) {
         console.error("Error publishing message:", err);
       } else {
