@@ -85,6 +85,9 @@ mqttClient.on("message", (topic, message) => {
       break;
     case "create":
       create(parts[1], parts[2], message.toString()).catch(console.dir);
+      break;
+    case "get":
+      getConfigs(parts[1]);
     default:
       break;
   }
@@ -135,6 +138,36 @@ async function create(name, conf, message) {
 
     const result = await user.insertOne(newConf);
     console.log(`A document was inserted with the _id: ${result.insertedId}`);
+
+  } catch (error) {
+    console.error("Error fetching user:", error);
+  }
+}
+
+async function getConfigs(name) {
+  try {
+    const database = mongoClient.db(config.mongodb.database);
+    const user = database.collection(collectionName);
+
+    const docs = await user.find({ name: name }).toArray();
+
+    const data = docs.map(doc => doc.config);
+
+    if (data.length === 0) {
+
+    }
+
+    let strConfig = "";
+    data.forEach((c) => {strConfig = strConfig + c.toString() + ",";});
+    strConfig = strConfig.slice(0, -1);
+
+    mqttClient.publish("send/" + name.toString(), strConfig, (err) => {
+      if (err) {
+        console.error("Error publishing message:", err);
+      } else {
+        console.log(`Message "${strConfig}" sent to topic "send/${name}"`);
+      }
+    });
 
   } catch (error) {
     console.error("Error fetching user:", error);
