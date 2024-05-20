@@ -156,7 +156,7 @@ async function getConfigs(name) {
 
     const docs = await user.find({ name: name }).toArray();
 
-    const data = docs.map(doc => doc.config);
+    const data = docs.map(doc => doc.conf);
 
     if (data.length === 0) {
       mqttClient.publish("send/" + name.toString(), "", (err) => {
