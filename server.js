@@ -58,19 +58,14 @@ async function run() {
 run().catch(console.dir);
 
 mqttClient.on("connect", () => {
-  mqttClient.subscribe("+", (err) => {
-    if (!err) {
-      console.log("Client connected");
-    }
-  });
-});
+  console.log("Client connected");
 
-mqttClient.subscribe("activate/#", (err, granted) => {
-  if (err) {
-    console.error("Subscription error:", err);
-    return;
-  }
-})
+  mqttClient.subscribe("activate/#", (err, granted) => {
+    if (err) {
+      console.error("Subscription error:", err);
+    }
+  })
+});
 
 mqttClient.on("message", (topic, message) => {
   // message is Buffer
@@ -79,8 +74,10 @@ mqttClient.on("message", (topic, message) => {
   const parts = topic.split("/");
   switch (parts[0]) {
     case "activate":
-      activate(parts[1], parts[2]);
+      activate(parts[1], parts[2]).catch(console.dir);
       break;
+    case "create":
+      create(parts[1], parts[2], message.toString()).catch(console.dir);
     default:
       break;
   }
@@ -101,7 +98,7 @@ async function activate(name, conf) {
     // Fetch the LED state from the user object
     const ledStates = [userObj.led1, userObj.led2, userObj.led3, userObj.led4];
 
-    for (let i = 0; i < ledStates.length; i++) {
+    for (let i = 1; i < ledStates.length; i++) {
       mqttClient.publish("LED" + i.toString(), ledStates[i], (err) => {
         if (err) {
           console.error("Error publishing message:", err);
@@ -110,6 +107,28 @@ async function activate(name, conf) {
         }
       });
     }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+  }
+}
+
+async function create(name, conf, message) {
+  try {
+    const database = mongoClient.db(config.mongodb.database);
+    const user = database.collection(collectionName);
+
+    const newConf = {
+      name: name,
+      conf: conf,
+      led1: message.charAt(0) === '1' ? "ON" : "OFF",
+      led2: message.charAt(1) === '1' ? "ON" : "OFF",
+      led3: message.charAt(2) === '1' ? "ON" : "OFF",
+      led4: message.charAt(3) === '1' ? "ON" : "OFF",
+    }
+
+    const result = await user.insertOne(newConf);
+    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+
   } catch (error) {
     console.error("Error fetching user:", error);
   }
